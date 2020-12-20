@@ -166,10 +166,10 @@ const Calendar = () => {
     }
   },[selectDate])
 
-  const makeDate = useCallback((index, date) => {
+  const makeDate = (index, date) => {
     const year = moment(TODAY).add(num, 'M').format('YYYY')
-    const prevYear = moment(year).add(-1, 'y').format('YYYY')
-    const nextYear = moment(year).add(1, 'y').format('YYYY')
+    const prevYear = moment(year).add(-1, 'M').format('YYYY')
+    const nextYear = moment(year).add(1, 'Y').format('YYYY')
 
     const month = moment(TODAY).add(num, 'M').format('MM')
     const prevMonth = moment(month).add(-1, 'M').format('MM')
@@ -192,7 +192,7 @@ const Calendar = () => {
     } else {
       return `${dashStandard}-${date}`
     }
-  },[monthDay])
+  }
 
   useEffect(() => {
     getStandardDate()

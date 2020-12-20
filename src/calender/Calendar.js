@@ -9,7 +9,7 @@ const TODAY = moment().format('YYYY-MM-DD')
 const CUREENT_MONTH = moment().format('YYYY-MM')
 
 // api 호출 전 dummy 데이터
-const list= ["1", "1", "1", "0", "1", "1", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "0", "0", "1", "1", "1", "0", "0"]
+const list= ["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "0"]
 
 const Calendar = () => {
 
@@ -192,7 +192,7 @@ const Calendar = () => {
     } else {
       return `${dashStandard}-${date}`
     }
-  },[monthDay, dashStandard])
+  },[monthDay])
 
   useEffect(() => {
     getStandardDate()
@@ -214,6 +214,7 @@ const Calendar = () => {
       return dateArr.map((el, index) => {
         // const dashDate = index < monthDay.startDay  || index >= (dateArr.length - (6 - monthDay.endDay))? el.date : `${dashStandard}-${el.date}`
         const dashDate = makeDate(index, el.date)
+        console.log(dashDate)
         const isOrigin = el.origin && el.able ? '' : 'grayed'
         const isAble = el.origin && !el.able ? 'notAble' : ''
         const selected = selectDate.startDate === dashDate ? 'selected' : ''

@@ -1,0 +1,105 @@
+body {
+  margin: 0;
+  padding: 0;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.Calendar{
+  user-select: none;
+  .head{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px;
+    button{
+      cursor: pointer;
+      outline: none;
+      display: inline-flex;
+      background: transparent;
+      border: none;
+      font-size: 20pt;
+      padding: 4px;
+      border-radius: 4px;
+      //&:hover{
+      //  background-color: rgba(gray,0.1);
+      //}
+      //&:active{
+      //  background-color: rgba(gray,0.2);
+      //}
+    }
+    span.title{
+      //cursor:pointer;
+      border-radius: 5px;
+      padding: 4px 12px;
+      //&:hover{
+      //  background-color: rgba(gray,0.1);
+      //}
+      //&:active{
+      //  background-color: rgba(gray,0.2);
+      //}
+    }
+  }
+  .body{
+    .row{
+      display: flex;
+      cursor: pointer;
+      flex-wrap: wrap;
+      &:first-child{
+        cursor: inherit;
+        .box{
+          font-weight: bold;
+        }
+        //.box:hover > span.text{
+        //  background-color: white;
+        //}
+      }
+      .box{
+        position: relative;
+        display: inline-flex;
+        width: calc(100%/7);
+        height: 0;
+        padding-bottom: calc(100%/7);
+        font-size: 12pt;
+        &:first-child{
+          color: #c70000;
+        }
+        &:last-child{
+          color: #2389e9;
+        }
+        &.grayed{
+          color: gray;
+        }
+
+        //&:hover{
+        //  span.text{
+        //    background-color: rgba(#588dff, 0.1);
+        //  }
+        //}
+
+        // 여기서 선택된 날짜에 대한 스타일을 주면 될 듯 함
+        &.selected{
+          span.text{
+            background-color: #2389e9;
+            color: white;
+          }
+        }
+        span.text{
+          border-radius: 10%;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          width: 85%;
+          height: 85%;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+        }
+      }
+    }
+  }
+}

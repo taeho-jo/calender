@@ -18,6 +18,8 @@ const Calendar = () => {
     startDate: '',
     endDate: ''
   })
+
+  const [middleDate, setMiddleDate] = useState([])
   console.log(selectDate)
 
   // 한달 시작 날짜와 마지막 날짜
@@ -184,31 +186,55 @@ const Calendar = () => {
     getRenderDate()
   },[monthDate])
 
+  useEffect(() => {
+    getMiddleDate()
+  },[selectDate])
+
+  const getMiddleDate = () => {
+    const { startDate, endDate } = selectDate
+
+    if(startDate && endDate) {
+      const arr = []
+      const period = moment(endDate).diff(moment(startDate), "days");
+      for(let i = 1; i <= period - 1; i++) {
+        let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
+        // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
+        arr.push(differencePeriod)
+        setMiddleDate(arr)
+      }
+    } else {
+      setMiddleDate([])
+    }
+
+  }
+console.log(middleDate)
   // 날짜 렌더 map 함수
   const renderDate = useCallback(() => {
     if(dateArr.length === 0 || dateArr === null) {
       return;
     } else {
       return dateArr.map((el, index) => {
-        // const dashDate = index < monthDay.startDay  || index >= (dateArr.length - (6 - monthDay.endDay))? el.date : `${dashStandard}-${el.date}`
-        // console.log(dashDate)
+
         const isOrigin = el.origin && el.able ? '' : 'grayed'
         const isAble = el.origin && !el.able ? 'notAble' : ''
         const selected = selectDate.startDate === el.date ? 'selected' : ''
         const selected2 = selectDate.endDate === el.date ? 'selected' : ''
+        const selected3 = middleDate.includes(el.date) ? 'selected' : ''
         const able = el.able ? 'able' : ''
 
         const renderItem = String(el.date).slice(8, 10)
 
+
+
         return (
-          <div className={`box ${isOrigin} ${isAble} ${selected} ${selected2}`} key={index} onClick={() => getDate(el.date, el.origin, el.able)}>
+          <div className={`box ${isOrigin} ${isAble} ${selected} ${selected2} ${selected3}`} key={index} onClick={() => getDate(el.date, el.origin, el.able)}>
             <span className={`text`}>{renderItem}</span>
             <div className={`${able}`}></div>
           </div>
         )
       })
     }
-  },[dateArr, selectDate])
+  },[dateArr, selectDate, middleDate])
 
   return (
     <div className="Calendar">

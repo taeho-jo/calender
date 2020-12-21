@@ -18,9 +18,8 @@ const Calendar = () => {
     startDate: '',
     endDate: ''
   })
-
+  // 중간날짜
   const [middleDate, setMiddleDate] = useState([])
-  console.log(selectDate)
 
   // 한달 시작 날짜와 마지막 날짜
   const [monthDate, setMonthDate] = useState({
@@ -45,6 +44,7 @@ const Calendar = () => {
   // 모든 날짜를 넣는 배열
   const [dateArr, setDateArr] = useState([])
 
+  // 날짜 계산
   const calculationDate = useCallback(() => {
     const startMonth = moment(`${dashStandard}-01`).format('YYYY-MM-DD')
     const startDay = moment(startMonth).day()
@@ -98,7 +98,7 @@ const Calendar = () => {
       prevArr.unshift({
         date: pervPeriod,
         origin: false,
-        able: false
+        able: true
       })
     }
 
@@ -109,14 +109,13 @@ const Calendar = () => {
       nextArr.push({
         date: nextPeriod,
         origin: false,
-        able: false
+        able: true
       })
     }
 
     // 달력 데이터 업데이트
     setDateArr([...prevArr, ...arr, ...nextArr])
   },[monthDate, monthDay, selectAbleDate])
-  console.log(dateArr)
 
   // 상단 헤더 년도+날짜 계산
   const getStandardDate = useCallback(() => {
@@ -137,42 +136,101 @@ const Calendar = () => {
     setNum(num - 1)
   },[num])
 
+  // 시작과 끝 날짜 사이 찾는 함
+  const getMiddleDate = useCallback((startDate, date) => {
+    const arr = []
+    if(startDate >= date) {
+      setMiddleDate([])
+    } else {
+
+      const period = moment(date).diff(moment(startDate), "days");
+      for(let i = 1; i <= period - 1; i++) {
+        let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
+        // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
+        arr.push(differencePeriod)
+        setMiddleDate(arr)
+      }
+      return arr
+    }
+  },[middleDate, selectDate])
+
+  // 중간 날짜에 able false 찾는 함수
+  const isFalseArr = useCallback((date) => {
+    if(dateArr.length === 0) {
+      return;
+    } else {
+      const bb = dateArr.filter(el => el.date === date)
+      if(bb.length === 0){
+        return;
+      } else if(bb[0].able === false) {
+        return false
+      } else {
+        return true
+      }
+    }
+  },[dateArr])
+
+  const findFalse = useCallback((arr) => {
+    if(arr === undefined) {
+      return []
+    } else {
+      const aa = []
+      for(let i = 0; i < arr.length; i++) {
+        aa.push(isFalseArr(arr[i]))
+      }
+      return aa
+    }
+  },[middleDate,selectDate])
+
   const getDate = useCallback((date, isOrigin, isAble) => {
-    console.log(date, 'sdfasdfasd')
     if(isAble) {
-      getSelectDate(date)
+      const getUnableDateArr = getMiddleDate(selectDate.startDate, date)
+      const getValue = findFalse(getUnableDateArr).includes(false)
+
+      getSelectDate(date, getValue)
     } else {
       console.log(date)
     }
-  },[selectDate])
+  },[selectDate, middleDate])
 
-  const getSelectDate = useCallback((date) => {
+  const getSelectDate = useCallback((date, getValue) => {
+
     const { startDate, endDate } = selectDate
+
     if(!startDate && !endDate) {
       setSelectDate({
         ...selectDate,
         startDate: date
       })
     } else if(startDate && !endDate) {
+      // 역할: 시작 날짜와 끝 날짜 업데이트
       if(startDate > date) {
         setSelectDate({
           startDate: date,
           endDate: ''
         });
       } else {
-        setSelectDate({
-          ...selectDate,
-          endDate: date
-        })
-      }
+        if(getValue) {
+          setSelectDate({
+            startDate: '',
+            endDate: ''
+          })
+        } else {
+          setSelectDate({
+            ...selectDate,
+            endDate: date
+          })
+        }
 
+      }
     } else if(startDate && endDate) {
+      setMiddleDate([])
       setSelectDate({
         startDate: date,
         endDate: ''
       })
     }
-  },[selectDate])
+  },[selectDate, middleDate])
 
   useEffect(() => {
     getStandardDate()
@@ -186,30 +244,10 @@ const Calendar = () => {
     getRenderDate()
   },[monthDate])
 
-  useEffect(() => {
-    getMiddleDate()
-  },[selectDate])
-
-  const getMiddleDate = () => {
-    const { startDate, endDate } = selectDate
-
-    if(startDate && endDate) {
-      const arr = []
-      const period = moment(endDate).diff(moment(startDate), "days");
-      for(let i = 1; i <= period - 1; i++) {
-        let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
-        // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
-        arr.push(differencePeriod)
-        setMiddleDate(arr)
-      }
-    } else {
-      setMiddleDate([])
-    }
-
-  }
-console.log(middleDate)
   // 날짜 렌더 map 함수
   const renderDate = useCallback(() => {
+    const getValue = findFalse(middleDate).includes(false)
+
     if(dateArr.length === 0 || dateArr === null) {
       return;
     } else {
@@ -219,12 +257,10 @@ console.log(middleDate)
         const isAble = el.origin && !el.able ? 'notAble' : ''
         const selected = selectDate.startDate === el.date ? 'selected' : ''
         const selected2 = selectDate.endDate === el.date ? 'selected' : ''
-        const selected3 = middleDate.includes(el.date) ? 'selected' : ''
+        const selected3 = middleDate.includes(el.date) && !getValue ? 'selected' : ''
         const able = el.able ? 'able' : ''
 
         const renderItem = String(el.date).slice(8, 10)
-
-
 
         return (
           <div className={`box ${isOrigin} ${isAble} ${selected} ${selected2} ${selected3}`} key={index} onClick={() => getDate(el.date, el.origin, el.able)}>

@@ -9,7 +9,7 @@ const TODAY = moment().format('YYYY-MM-DD')
 const CUREENT_MONTH = moment().format('YYYY-MM')
 
 // api 호출 전 dummy 데이터
-const list= ["1", "1", "1", "1", "1", "1", "0", "0", "0", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "0", "0", "0"]
+const list= ["1", "1", "1", "1", "1", "1", "0", "0", "0", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1"]
 
 const Calendar = () => {
 
@@ -18,6 +18,7 @@ const Calendar = () => {
     startDate: '',
     endDate: ''
   })
+  console.log(selectDate)
 
   // 한달 시작 날짜와 마지막 날짜
   const [monthDate, setMonthDate] = useState({
@@ -79,7 +80,7 @@ const Calendar = () => {
 
     //해당 달에 대한 계산
     for(let i = 0; i <= period; i++) {
-      let differencePeriod = moment(startDate).add(i, "d").format("DD");
+      let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
       // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
       arr.push({
         date: differencePeriod,
@@ -90,7 +91,7 @@ const Calendar = () => {
 
     // 해당 달의 시작 요일 이전 날짜 계산
     for(let i = 1; i <= startDay; i++) {
-      let pervPeriod = moment(startDate).add(-i, 'd').format('DD')
+      let pervPeriod = moment(startDate).add(-i, 'd').format('YYYY-MM-DD')
       // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
       prevArr.unshift({
         date: pervPeriod,
@@ -101,7 +102,7 @@ const Calendar = () => {
 
     // 해당 달의 마지막 요일 이후의 날짜 계산
     for(let i = 1; i <= 6 - endDay; i++) {
-      let nextPeriod = moment(endDate).add(i, 'd').format('DD')
+      let nextPeriod = moment(endDate).add(i, 'd').format('YYYY-MM-DD')
       // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
       nextArr.push({
         date: nextPeriod,
@@ -113,6 +114,7 @@ const Calendar = () => {
     // 달력 데이터 업데이트
     setDateArr([...prevArr, ...arr, ...nextArr])
   },[monthDate, monthDay, selectAbleDate])
+  console.log(dateArr)
 
   // 상단 헤더 년도+날짜 계산
   const getStandardDate = useCallback(() => {
@@ -134,6 +136,7 @@ const Calendar = () => {
   },[num])
 
   const getDate = useCallback((date, isOrigin, isAble) => {
+    console.log(date, 'sdfasdfasd')
     if(isAble) {
       getSelectDate(date)
     } else {
@@ -150,7 +153,10 @@ const Calendar = () => {
       })
     } else if(startDate && !endDate) {
       if(startDate > date) {
-        return;
+        setSelectDate({
+          startDate: date,
+          endDate: ''
+        });
       } else {
         setSelectDate({
           ...selectDate,
@@ -165,34 +171,6 @@ const Calendar = () => {
       })
     }
   },[selectDate])
-
-  const makeDate = (index, date) => {
-    const year = moment(TODAY).add(num, 'M').format('YYYY')
-    const prevYear = moment(year).add(-1, 'M').format('YYYY')
-    const nextYear = moment(year).add(1, 'Y').format('YYYY')
-
-    const month = moment(TODAY).add(num, 'M').format('MM')
-    const prevMonth = moment(month).add(-1, 'M').format('MM')
-    // const nextMonth = moment(month).add(1, 'm').format('MM')
-    const nextMonth = moment(month).add(1, 'M').format('MM')
-    // console.log(nextMonth)
-
-    if(index < monthDay.startDay) {
-      if(month === '01') {
-        return `${prevYear}-${prevMonth}-${date}`
-      } else {
-        return `${year}-${prevMonth}-${date}`
-      }
-    } else if(index >= (dateArr.length - (6 - monthDay.endDay))) {
-      if(month === '12') {
-        return `${nextYear}-${nextMonth}-${date}`
-      } else {
-        return `${year}-${nextMonth}-${date}`
-      }
-    } else {
-      return `${dashStandard}-${date}`
-    }
-  }
 
   useEffect(() => {
     getStandardDate()
@@ -213,17 +191,18 @@ const Calendar = () => {
     } else {
       return dateArr.map((el, index) => {
         // const dashDate = index < monthDay.startDay  || index >= (dateArr.length - (6 - monthDay.endDay))? el.date : `${dashStandard}-${el.date}`
-        const dashDate = makeDate(index, el.date)
-        console.log(dashDate)
+        // console.log(dashDate)
         const isOrigin = el.origin && el.able ? '' : 'grayed'
         const isAble = el.origin && !el.able ? 'notAble' : ''
-        const selected = selectDate.startDate === dashDate ? 'selected' : ''
-        const selected2 = selectDate.endDate === dashDate ? 'selected' : ''
+        const selected = selectDate.startDate === el.date ? 'selected' : ''
+        const selected2 = selectDate.endDate === el.date ? 'selected' : ''
         const able = el.able ? 'able' : ''
 
+        const renderItem = String(el.date).slice(8, 10)
+
         return (
-          <div className={`box ${isOrigin} ${isAble} ${selected} ${selected2}`} key={index} onClick={() => getDate(dashDate, el.origin, el.able)}>
-            <span className={`text`}>{el.date}</span>
+          <div className={`box ${isOrigin} ${isAble} ${selected} ${selected2}`} key={index} onClick={() => getDate(el.date, el.origin, el.able)}>
+            <span className={`text`}>{renderItem}</span>
             <div className={`${able}`}></div>
           </div>
         )

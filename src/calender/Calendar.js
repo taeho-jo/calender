@@ -272,15 +272,28 @@ const Calendar = () => {
   },[dateArr, selectDate, middleDate])
 
   // ======================================================
-  const data = '웹뷰에서 보내는 메세지'
-  const a = () => {
-    window.postMessage(JSON.stringify(data),'*')
+  const onMessageHandler = (e) => {
+    const event = JSON.parse(e.data)
+    window.ReactNativeWebView.postMessage(JSON.stringify({ event: event }))
   }
 
   useEffect(() => {
-    a()
-  },[])
+    const isUIWebView = () => {
+      return navigator.userAgent
+          .toLowerCase()
+          .match(/\(ip.*applewebkit(?!.*(version|crios))/)
+    }
 
+    const receiver = isUIWebView() ? window : document
+
+    receiver.addEventListener('message', onMessageHandler)
+    return () => {
+      receiver.removeEventListener('message', onMessageHandler)
+    }
+  })
+
+
+  // ======================================================
   return (
     <div className="Calendar">
       <div className="head">

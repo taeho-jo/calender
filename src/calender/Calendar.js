@@ -12,7 +12,6 @@ const CUREENT_MONTH = moment().format('YYYY-MM')
 const list= ["1", "1", "1", "1", "1", "1", "0", "0", "0", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1"]
 
 const Calendar = () => {
-
   // 선택된 시작 날짜와 마지막 날짜
   const [selectDate, setSelectDate] = useState({
     startDate: '',
@@ -271,6 +270,22 @@ const Calendar = () => {
       })
     }
   },[dateArr, selectDate, middleDate])
+
+  // ======================================================
+  const a = () => {
+    if(window.ReactNativeWebView) {
+      // window.ReactNativeWebView.postMessage(
+      //     JSON.stringify('호로로로로로로로ㅗㄹ~')
+      // )
+      alert('모바일이네??')
+    } else {
+      alert('모바일로 접속하소~')
+    }
+  }
+
+  useEffect(() => {
+    a()
+  },[])
 
   return (
     <div className="Calendar">

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import './calendar.scss'
 import moment from "moment";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import axios from 'axios'
 
 // 오늘 날짜
 const TODAY = moment().format('YYYY-MM-DD')
@@ -12,6 +13,9 @@ const CUREENT_MONTH = moment().format('YYYY-MM')
 const list= ["1", "1", "1", "1", "1", "1", "0", "0", "0", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1"]
 
 const Calendar = () => {
+
+  const mainCalendar = useRef(null)
+  const [ token, setToken ] = useState('')
   // 선택된 시작 날짜와 마지막 날짜
   const [selectDate, setSelectDate] = useState({
     startDate: '',
@@ -243,6 +247,35 @@ const Calendar = () => {
     getRenderDate()
   },[monthDate])
 
+
+  // 모바일로 날짜 넘겨주는 부분
+  const sendData = useCallback(() => {
+    window.ReactNativeWebView.postMessage(JSON.stringify(selectDate))
+  },[selectDate])
+
+
+  // ======================================== api 통신 test ========================================
+  const [data, setData] = useState([])
+  const getInitData = async () => {
+    try {
+      const res = axios.get('http://15.165.17.192:8080/api/space/reserveMonth/SPAC00000001/202012', {
+        headers: {
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJNRU1CMDAwMDAwMDEiLCJpYXQiOjE2MDg2MzE4NjcsImV4cCI6MTYwODY2MTg2N30.0W1jhgVTq50OO4QISRrU-caxngTrZFFEQVX6nZ_nS_k',
+          withCredentials: true
+        }
+      })
+      setData(res)
+      console.log(res)
+    } catch (e) {
+      console.log(e, 'eeeee')
+    }
+  }
+
+  useEffect(() => {
+    getInitData()
+  },[])
+  // ======================================== api 통신 test ========================================
+
   // 날짜 렌더 map 함수
   const renderDate = useCallback(() => {
     const getValue = findFalse(middleDate).includes(false)
@@ -272,30 +305,8 @@ const Calendar = () => {
   },[dateArr, selectDate, middleDate])
 
   // ======================================================
-  const onMessageHandler = (e) => {
-    const event = JSON.parse(e.data)
-    window.ReactNativeWebView.postMessage(JSON.stringify({ event: event }))
-  }
-
-  useEffect(() => {
-    const isUIWebView = () => {
-      return navigator.userAgent
-          .toLowerCase()
-          .match(/\(ip.*applewebkit(?!.*(version|crios))/)
-    }
-
-    const receiver = isUIWebView() ? window : document
-
-    receiver.addEventListener('message', onMessageHandler)
-    return () => {
-      receiver.removeEventListener('message', onMessageHandler)
-    }
-  })
-
-
-  // ======================================================
   return (
-    <div className="Calendar">
+    <div className="Calendar" ref={mainCalendar}>
       <div className="head">
         <button onClick={minusMonth}><MdChevronLeft /></button>
         <span className="title">{standard}</span>
@@ -329,6 +340,7 @@ const Calendar = () => {
           {renderDate()}
         </div>
       </div>
+      <button onClick={sendData}>버트은</button>
     </div>
   )
 }

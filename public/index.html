@@ -40,4 +40,14 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script>
+    // RN으로 부터 데이터 받아오는 곳
+    (function() {
+      window.addEventListener('message', (msg) => {
+        let token = msg.data;
+        alert(token)
+        localStorage.setItem('token',`Bearer ${token}`)
+      })
+    })()
+  </script>
 </html>

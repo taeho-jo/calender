@@ -272,15 +272,9 @@ const Calendar = () => {
   },[dateArr, selectDate, middleDate])
 
   // ======================================================
+  const data = '웹뷰에서 보내는 메세지'
   const a = () => {
-    if(window.ReactNativeWebView) {
-      // window.ReactNativeWebView.postMessage(
-      //     JSON.stringify('호로로로로로로로ㅗㄹ~')
-      // )
-      alert('모바일이네??')
-    } else {
-      alert('모바일로 접속하소~')
-    }
+    window.postMessage(JSON.stringify(data),'*')
   }
 
   useEffect(() => {

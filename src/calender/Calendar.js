@@ -1,22 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import './calendar.scss'
 import moment from "moment";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import axios from 'axios'
+import TimeTable from "./TimeTable";
+
 
 // 오늘 날짜
 const TODAY = moment().format('YYYY-MM-DD')
 // 오늘 년 월
 const CUREENT_MONTH = moment().format('YYYY-MM')
 
-// api 호출 전 dummy 데이터
-const list= ["1", "1", "1", "1", "1", "1", "0", "0", "0", "1", "1", "0", "0", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "0", "0", "1", "1", "1", "1", "1", "1"]
-
 const Calendar = () => {
+  const mainCalendar = useRef(null)
 
+  const [buttonDisable, setButtonDisable] = useState(true)
+
+  const [ableDateList, setAbleDateList] = useState({
+    prev: [],
+    selected: [],
+    next: []
+  })
   // 선택된 시작 날짜와 마지막 날짜
   const [selectDate, setSelectDate] = useState({
     startDate: '',
-    endDate: ''
+    endDate: '',
+    time: []
   })
   // 중간날짜
   const [middleDate, setMiddleDate] = useState([])
@@ -32,6 +41,11 @@ const Calendar = () => {
     endDay: moment(`${CUREENT_MONTH}-01`).add(1, 'M').add(-1, 'd').day()
   })
 
+  const [monthLength, setMonthLength] = useState({
+    prevMonth: 0,
+    nextMonth: 0
+  })
+
   // 날짜 계산을 위한 덧셈 뺄셈 숫자
   const [ num, setNum ] = useState(0)
 
@@ -40,6 +54,11 @@ const Calendar = () => {
 
   // 날짜 계산을 위한 기준 년 월 일
   const [dashStandard, setDashStandard] = useState('')
+  const [threeMonth, setThreeMonth] = useState({
+    prevMonth: '',
+    currentMonth: '',
+    nextMonth: ''
+  })
 
   // 모든 날짜를 넣는 배열
   const [dateArr, setDateArr] = useState([])
@@ -52,6 +71,16 @@ const Calendar = () => {
     const endMonth = moment(`${dashStandard}-01`).add(1, 'M').add(-1, 'd').format('YYYY-MM-DD')
     const endDay = moment(endMonth).day()
 
+    // 이전 달 일수 계산
+    const prevStartMonth =  moment(`${dashStandard}-01`).add(-1, 'M').format('YYYY-MM-DD')
+    const prevEndMonth =  moment(`${dashStandard}-01`).add(-1, 'd').format('YYYY-MM-DD')
+    const prevMonthLenght = moment(prevEndMonth).diff(moment(prevStartMonth), "days");
+
+    // 다음 달 일수 계산
+    const nextStartMonth =  moment(`${dashStandard}-01`).add(+1, 'M').format('YYYY-MM-DD')
+    const nextEndMonth =  moment(`${dashStandard}-01`).add(2, 'M').add(-1, 'd').format('YYYY-MM-DD')
+    const nextMonthLenght = moment(nextEndMonth).diff(moment(nextStartMonth), "days");
+
     setMonthDate({
       startDate: startMonth,
       endDate: endMonth
@@ -60,11 +89,40 @@ const Calendar = () => {
       startDay: startDay,
       endDay: endDay
     })
-  },[dashStandard, monthDate, monthDay])
+
+    setMonthLength({
+      prevMonth: prevMonthLenght + 1,
+      nextMonth: nextMonthLenght + 1
+    })
+  },[dashStandard, monthDate, monthDay, monthLength])
 
   // 예약 가능 날짜 판단
   const selectAbleDate = useCallback((i) => {
-    if (list[i] === '0') {
+    if (ableDateList.selected[i] === '0') {
+      return false
+    } else {
+      return true
+    }
+  },[ableDateList])
+
+  const prevSelectAbleDate = useCallback((i, arr, length, a) => {
+    const month = arr.slice(0, length)
+    const month2 = month.slice(month.length - a, month.length)
+
+    if(month2[i-1] === '0') {
+
+      return false
+    } else {
+      return true
+    }
+  },[])
+
+  const nextSelectAbleDate = useCallback((i, arr, length, a) => {
+    const month = arr.slice(0, length)
+    const month2 = month.slice(0, a)
+
+    if(month2[i-1] === '0') {
+
       return false
     } else {
       return true
@@ -98,7 +156,7 @@ const Calendar = () => {
       prevArr.unshift({
         date: pervPeriod,
         origin: false,
-        able: true
+        able: prevSelectAbleDate(i, ableDateList.prev, monthLength.prevMonth, startDay)
       })
     }
 
@@ -109,23 +167,32 @@ const Calendar = () => {
       nextArr.push({
         date: nextPeriod,
         origin: false,
-        able: true
+        able: nextSelectAbleDate(i, ableDateList.next, monthLength.nextMonth, 6-endDay)
       })
     }
 
     // 달력 데이터 업데이트
     setDateArr([...prevArr, ...arr, ...nextArr])
-  },[monthDate, monthDay, selectAbleDate])
+  },[monthDate, monthDay, selectAbleDate, ableDateList, monthLength])
 
   // 상단 헤더 년도+날짜 계산
   const getStandardDate = useCallback(() => {
     const year = moment(TODAY).add(num, 'M').format('YYYY')
     const month = moment(TODAY).add(num, 'M').format('MM')
+
+    const prevMonth = moment(`${year}-${month}`).add(-1, 'M').format(('YYYY-MM'))
+    const nextMonth = moment(`${year}-${month}`).add(1, 'M').format(('YYYY-MM'))
+
     // 달력 헤더
     setStandard(`${year}년 ${month}월`)
 
     // 날짜 계산을 위한 dash 기준
     setDashStandard(`${year}-${month}`)
+    setThreeMonth({
+      prevMonth: prevMonth.split('-').join(''),
+      currentMonth: `${year}${month}`,
+      nextMonth: nextMonth.split('-').join('')
+    })
   },[num, standard, dashStandard])
 
   const addMonth = useCallback(() => {
@@ -183,7 +250,6 @@ const Calendar = () => {
   },[middleDate,selectDate])
 
   const getDate = useCallback((date, isOrigin, isAble) => {
-    console.log('aaaa')
     if(isAble) {
       const getUnableDateArr = getMiddleDate(selectDate.startDate, date)
       const getValue = findFalse(getUnableDateArr).includes(false)
@@ -212,6 +278,7 @@ const Calendar = () => {
         });
       } else {
         if(getValue) {
+          alert('선택이 불가능한 일자가 포함되어있습니다.')
           setSelectDate({
             startDate: '',
             endDate: ''
@@ -233,6 +300,32 @@ const Calendar = () => {
     }
   },[selectDate, middleDate])
 
+  // 모바일로 날짜 넘겨주는 부분
+  const sendData = useCallback(() => {
+    window.ReactNativeWebView.postMessage(JSON.stringify(selectDate))
+    localStorage.clear()
+  },[selectDate])
+
+  const getInitDate = useCallback(async () => {
+    try {
+
+      // alert(`getInitData ${localStorage.getItem('id')} // ${localStorage.getItem('token')}`)
+      const res = await axios.get(`http://15.165.17.192:8080/api/space/reserveMonth/${localStorage.getItem('id')}/${threeMonth.currentMonth}`, {
+        headers: {
+          Authorization: localStorage.getItem('token'),
+          withCredentials: true
+        }
+      })
+      setAbleDateList({
+        prev: res.data.data.prev,
+        selected: res.data.data.selected,
+        next: res.data.data.next
+      })
+    } catch (e) {
+      console.log(e, 'eeeee')
+    }
+  },[threeMonth, localStorage])
+
   useEffect(() => {
     getStandardDate()
   },[num])
@@ -243,7 +336,42 @@ const Calendar = () => {
 
   useEffect(() => {
     getRenderDate()
-  },[monthDate])
+  },[monthDate, ableDateList])
+
+  useEffect(() => {
+    const { startDate, endDate, time } = selectDate
+    const TYPE = localStorage.getItem('type')
+    //type spcl0001 / 2 / 3
+    if(TYPE === 'SPCL0001') {
+      if(startDate && endDate) {
+        setButtonDisable(false)
+      } else {
+        setButtonDisable(true)
+      }
+    } else if(TYPE === 'SPCL0002') {
+      if(startDate) {
+        setButtonDisable(false)
+      } else {
+        setButtonDisable(true)
+      }
+    } else if(TYPE === 'SPCL0003') {
+      if(startDate && time.length > 0) {
+        setButtonDisable(false)
+      } else {
+        setButtonDisable(true)
+      }
+    }
+
+  },[selectDate, localStorage])
+
+
+  // ======================================== api 통신 test ========================================
+
+  useEffect(() => {
+    getInitDate()
+  },[threeMonth, localStorage])
+
+  // ======================================== api 통신 test ========================================
 
   // 날짜 렌더 map 함수
   const renderDate = useCallback(() => {
@@ -271,10 +399,14 @@ const Calendar = () => {
         )
       })
     }
-  },[dateArr, selectDate, middleDate])
+  },[dateArr, selectDate, middleDate, ableDateList])
 
+  const disabledStyle = buttonDisable ? 'disable' : ''
+
+
+  // ======================================================
   return (
-    <div className="Calendar">
+    <div className="Calendar" ref={mainCalendar}>
       <div className="head">
         <button onClick={minusMonth}><MdChevronLeft /></button>
         <span className="title">{standard}</span>
@@ -308,6 +440,15 @@ const Calendar = () => {
           {renderDate()}
         </div>
       </div>
+      {localStorage.getItem('type') === 'SPCL0003' ? (
+        <TimeTable selectDate={selectDate} setSelectDate={setSelectDate}/>
+      ) : null}
+
+
+      <div className='confirmButtonBox'>
+        <button className={`confirmButton ${disabledStyle}`} disabled={buttonDisable} onClick={sendData}>다음</button>
+      </div>
+
     </div>
   )
 }

@@ -40,4 +40,25 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+  <script>
+    // RN으로 부터 데이터 받아오는 곳
+    (function() {
+      window.addEventListener('message', (msg) => {
+        let data = JSON.parse(msg.data)
+        let token = data.token;
+        let id = data.spaceId
+        let type = data.type
+        // alert(`index.html ${id} ${token}`)
+        // if(localStorage.getItem('token') && localStorage.getItem('id')) {
+        //   localStorage.setItem('token',`Bearer ${token}`)
+        //   localStorage.setItem('id',id)
+        // } else {
+          localStorage.setItem('token',`Bearer ${token}`)
+          localStorage.setItem('id',id)
+          localStorage.setItem('type', type)
+        // }
+
+      })
+    })()
+  </script>
 </html>

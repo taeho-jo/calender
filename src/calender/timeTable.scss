@@ -1,0 +1,76 @@
+.mainContainer {
+  padding: 10px 20px 0 20px;
+  //background-color: powderblue;
+  margin-top: 10px;
+
+  .mainContainerTitle {
+    font-size: 16px;
+    font-weight: bold;
+    font-style: normal;
+    line-height: 20px;
+    letter-spacing: -0.3;
+    color: black;
+  }
+  .mainContainerSubTitle {
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 16px;
+    letter-spacing: 0;
+    color: #8f92a1;
+  }
+
+  .timeContainer {
+    margin-top: 10px;
+    .timeTitle {
+      font-size: 12px;
+      font-weight: bold;
+      font-style: normal;
+      line-height: 16px;
+      letter-spacing: 0;
+      color: black;
+    }
+    .buttonBox {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      .activeButton {
+        width: 75px;
+        height: 40px;
+        margin-top: 5px;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #d2d3d9;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        font-style: normal;
+        letter-spacing: -0.03;
+        background: none;
+        outline: none;
+        appearance: none;
+      }
+      .disabledStyle {
+        color: #a5a5a6;
+        border: none;
+        background: #fafafb
+      }
+      .active {
+        border-color: #0774dd;
+        color: #0774dd;
+        background: #f2f9ff;
+
+      }
+    }
+  }
+  .pmContainer {
+    margin-top: 15px;
+  }
+}
+

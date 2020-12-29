@@ -25,6 +25,7 @@ const Calendar = () => {
   const [selectDate, setSelectDate] = useState({
     startDate: '',
     endDate: '',
+    date: [],
     time: []
   })
   // 중간날짜
@@ -261,48 +262,84 @@ const Calendar = () => {
   },[selectDate, middleDate])
 
   const getSelectDate = useCallback((date, getValue) => {
-
+    const TYPE = localStorage.getItem('type')
     const { startDate, endDate } = selectDate
-
-    if(!startDate && !endDate) {
-      setSelectDate({
-        ...selectDate,
-        startDate: date
-      })
-    } else if(startDate && !endDate) {
-      // 역할: 시작 날짜와 끝 날짜 업데이트
-      if(startDate > date) {
+    if(TYPE === 'SPCL0003') {
+        setSelectDate({
+          ...selectDate,
+          startDate: date
+        })
+    } else {
+      if(!startDate && !endDate) {
+        setSelectDate({
+          ...selectDate,
+          startDate: date
+        })
+      } else if(startDate && !endDate) {
+        // 역할: 시작 날짜와 끝 날짜 업데이트
+        if(startDate > date) {
+          setSelectDate({
+            startDate: date,
+            endDate: ''
+          });
+        } else {
+          if(getValue) {
+            alert('선택이 불가능한 일자가 포함되어있습니다.')
+            setSelectDate({
+              startDate: '',
+              endDate: ''
+            })
+          } else {
+            setSelectDate({
+              ...selectDate,
+              endDate: date
+            })
+          }
+        }
+      } else if(startDate && endDate) {
+        setMiddleDate([])
         setSelectDate({
           startDate: date,
           endDate: ''
-        });
-      } else {
-        if(getValue) {
-          alert('선택이 불가능한 일자가 포함되어있습니다.')
-          setSelectDate({
-            startDate: '',
-            endDate: ''
-          })
-        } else {
-          setSelectDate({
-            ...selectDate,
-            endDate: date
-          })
-        }
-
+        })
       }
-    } else if(startDate && endDate) {
-      setMiddleDate([])
-      setSelectDate({
-        startDate: date,
-        endDate: ''
-      })
     }
+
+
   },[selectDate, middleDate])
 
   // 모바일로 날짜 넘겨주는 부분
   const sendData = useCallback(() => {
-    window.ReactNativeWebView.postMessage(JSON.stringify(selectDate))
+    const TYPE = localStorage.getItem('type')
+    const { startDate, endDate, date, time } = selectDate
+    let sendObject;
+    if(TYPE === 'SPCL0001') {
+      sendObject = {
+        startDate: startDate,
+        endDate: endDate,
+        date: [startDate, ...middleDate],
+        time: time,
+        spaceId: localStorage.getItem('id')
+      }
+    } else if(TYPE === 'SPCL0002') {
+      sendObject = {
+        startDate: startDate,
+        endDate: endDate,
+        date: [startDate, ...middleDate, endDate],
+        time: time,
+        spaceId: localStorage.getItem('id')
+      }
+    } else if(TYPE === 'SPCL0003') {
+      sendObject = {
+        startDate: startDate,
+        endDate: endDate,
+        date: [startDate],
+        time: time,
+        spaceId: localStorage.getItem('id')
+      }
+    }
+
+    window.ReactNativeWebView.postMessage(JSON.stringify(sendObject))
     localStorage.clear()
   },[selectDate])
 

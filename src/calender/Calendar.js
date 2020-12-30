@@ -11,6 +11,8 @@ const TODAY = moment().format('YYYY-MM-DD')
 // 오늘 년 월
 const CUREENT_MONTH = moment().format('YYYY-MM')
 
+const ARR = ["9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00"];
+
 const Calendar = () => {
   const mainCalendar = useRef(null)
 
@@ -206,19 +208,24 @@ const Calendar = () => {
 
   // 시작과 끝 날짜 사이 찾는 함
   const getMiddleDate = useCallback((startDate, date) => {
+    const TYPE = localStorage.getItem('type')
     const arr = []
-    if(startDate >= date) {
-      setMiddleDate([])
+    if(TYPE === 'SPCL0003') {
+      return
     } else {
+      if(startDate >= date) {
+        setMiddleDate([])
+      } else {
 
-      const period = moment(date).diff(moment(startDate), "days");
-      for(let i = 1; i <= period - 1; i++) {
-        let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
-        // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
-        arr.push(differencePeriod)
-        setMiddleDate(arr)
+        const period = moment(date).diff(moment(startDate), "days");
+        for(let i = 1; i <= period - 1; i++) {
+          let differencePeriod = moment(startDate).add(i, "d").format("YYYY-MM-DD");
+          // date: 날짜, origin: 해당 월의 날짜 인지 판단, able: 예약 가능한 날짜 인지 판단
+          arr.push(differencePeriod)
+          setMiddleDate(arr)
+        }
+        return arr
       }
-      return arr
     }
   },[middleDate, selectDate])
 
@@ -289,6 +296,7 @@ const Calendar = () => {
               startDate: '',
               endDate: ''
             })
+            setMiddleDate([])
           } else {
             setSelectDate({
               ...selectDate,
@@ -309,7 +317,7 @@ const Calendar = () => {
   },[selectDate, middleDate])
 
   // 모바일로 날짜 넘겨주는 부분
-  const sendData = useCallback(() => {
+  const sendData = useCallback(async () => {
     const TYPE = localStorage.getItem('type')
     const { startDate, endDate, date, time } = selectDate
     let sendObject;
@@ -318,30 +326,72 @@ const Calendar = () => {
         startDate: startDate,
         endDate: endDate,
         date: [startDate, ...middleDate],
-        time: time,
-        spaceId: localStorage.getItem('id')
+        time: time === undefined ? [] : time,
+        spaceId: localStorage.getItem('id'),
+        osName: localStorage.getItem('os_name')
       }
     } else if(TYPE === 'SPCL0002') {
+      const arr = endDate ? [startDate, ...middleDate, endDate] : [startDate]
       sendObject = {
         startDate: startDate,
         endDate: endDate,
-        date: [startDate, ...middleDate, endDate],
-        time: time,
-        spaceId: localStorage.getItem('id')
+        date: arr,
+        time: time === undefined ? [] : time,
+        spaceId: localStorage.getItem('id'),
+        osName: localStorage.getItem('os_name')
       }
     } else if(TYPE === 'SPCL0003') {
       sendObject = {
         startDate: startDate,
         endDate: endDate,
         date: [startDate],
-        time: time,
-        spaceId: localStorage.getItem('id')
+        time: time === undefined ? [] : time,
+        spaceId: localStorage.getItem('id'),
+        osName: localStorage.getItem('os_name')
       }
     }
+    const config = {
+      headers: {
+        Authorization: `${localStorage.getItem('token')}`
+      }
+    }
+    try{
+      const res = await axios.post(`http://15.165.17.192:8080/api/space/reserveNext/`, sendObject , config)
+        if(localStorage.getItem('os_name') === 'AOS') {
+          const startDate = res.data.data.startDate
+          const endDate = res.data.data.endDate === '' ? 0 : res.data.data.endDate
+          const firstSelectTime = ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join()
+          const secondSelectTime = ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).join()
+          const thirdSelectTime = ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join()
+          const spaceName = res.data.data.spaceName
+          const totalPrice = res.data.data.totalPrice
+          let spacepayment;
+          // console.log("::::::",startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice )
+          spacepayment.spacepaymentValue(startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
+          localStorage.clear()
+        } else if(localStorage.getItem('os_name') === 'IOS') {
+          makeSendData(res.data.data)
+        }
+    } catch (e) {
+      // window.ReactNativeWebView.postMessage(JSON.stringify(e.response.statusText))
+      console.log(e.response)
+    }
+  },[selectDate, middleDate])
 
-    window.ReactNativeWebView.postMessage(JSON.stringify(sendObject))
+  const makeSendData = (data) => {
+    const timeList = data.time
+    const aar = []
+    if(timeList) {
+      for(let i = 0; i < timeList.length; i++) {
+        aar.push(...ARR.slice(timeList[i], timeList[i]+1))
+      }
+      data.time = aar
+    }
+
+
+    window.ReactNativeWebView.postMessage(JSON.stringify(data))
     localStorage.clear()
-  },[selectDate])
+  }
 
   const getInitDate = useCallback(async () => {
     try {
@@ -361,7 +411,7 @@ const Calendar = () => {
     } catch (e) {
       console.log(e, 'eeeee')
     }
-  },[threeMonth, localStorage])
+  },[threeMonth, localStorage, ARR])
 
   useEffect(() => {
     getStandardDate()
@@ -478,7 +528,7 @@ const Calendar = () => {
         </div>
       </div>
       {localStorage.getItem('type') === 'SPCL0003' ? (
-        <TimeTable selectDate={selectDate} setSelectDate={setSelectDate}/>
+        <TimeTable ARR={ARR} selectDate={selectDate} setSelectDate={setSelectDate}/>
       ) : null}
 
 

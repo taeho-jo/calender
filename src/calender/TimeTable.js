@@ -2,14 +2,17 @@ import React, { useState, useCallback, useEffect} from 'react'
 import './timeTable.scss'
 
 const ARR = ["9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00"];
-const AM = ARR.slice(0, 4)
-const PM = ARR.slice(4, 12)
 
-const TEST_ARR = [0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,];
-const TEST_AM = TEST_ARR.slice(0, 4)
-const TEST_PM = TEST_ARR.slice(4, 12)
 
-const TimeTable = ({selectDate, setSelectDate}) => {
+const TimeTable = ({selectDate, setSelectDate, ARR}) => {
+  const AM = ARR.slice(0, 4)
+  const PM = ARR.slice(4, 12)
+
+  const TEST_ARR = [0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,];
+  const TEST_AM = TEST_ARR.slice(0, 4)
+  const TEST_PM = TEST_ARR.slice(4, 12)
+
+
   const [selectTime, setSelectTime] = useState([]);
 
   const selectReserveTime = useCallback((time) => {
@@ -36,7 +39,7 @@ const TimeTable = ({selectDate, setSelectDate}) => {
           time: [...selectTime, time]
         })
       }
-    }, [selectTime])
+    }, [selectTime, selectDate])
 
   console.log(selectTime)
 
@@ -61,7 +64,7 @@ const TimeTable = ({selectDate, setSelectDate}) => {
         </button>
       )
     })
-  },[selectTime])
+  },[selectTime, selectDate])
 
   const getPmButton = useCallback(() => {
     return PM.map((el, index) => {
@@ -74,7 +77,7 @@ const TimeTable = ({selectDate, setSelectDate}) => {
         </button>
       )
     })
-  },[selectTime])
+  },[selectTime, selectDate])
 
 
   return (

@@ -26,9 +26,10 @@
     -->
     <title>React App</title>
     <script>
-      localStorage.setItem("token","Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJNRU1CMDAwMDAwMDEiLCJpYXQiOjE2MDg3NzQyOTUsImV4cCI6MTYwODgwNDI5NX0.5CLyZHUwlEOO0vDJIr8rwDZBjOcgqfgHgKwJwkRMxAU");
+      localStorage.setItem("token","Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJNRU1CMDAwMDAwMDEiLCJpYXQiOjE2MDkyOTgyODgsImV4cCI6MTYwOTMyODI4OH0.N9v4RGmg5QMG-m-T52N397M1sN--tMTR-LVlerlAnxc");
       localStorage.setItem("id","SPAC00000001");
       localStorage.setItem("type","SPCL0001");
+      localStorage.setItem("os_name","IOS");
     </script>
   </head>
   <body>
@@ -47,23 +48,25 @@
   </body>
   <script>
     // RN으로 부터 데이터 받아오는 곳
-    (function() {
-      window.addEventListener('message', (msg) => {
-        let data = JSON.parse(msg.data)
-        let token = data.token;
-        let id = data.spaceId
-        let type = data.type
-        // alert(`index.html ${id} ${token}`)
-        // if(localStorage.getItem('token') && localStorage.getItem('id')) {
-        //   localStorage.setItem('token',`Bearer ${token}`)
-        //   localStorage.setItem('id',id)
-        // } else {
-          localStorage.setItem('token',`Bearer ${token}`)
-          localStorage.setItem('id',id)
-          localStorage.setItem('type', type)
-        // }
-
-      })
-    })()
+    // (function() {
+    //   window.addEventListener('message', (msg) => {
+    //     let data = JSON.parse(msg.data)
+    //     let token = data.token;
+    //     let id = data.spaceId
+    //     let type = data.type
+    //     let osNmae = data['os_name']
+    //     // alert(`index.html ${id} ${token}`)
+    //     // if(localStorage.getItem('token') && localStorage.getItem('id')) {
+    //     //   localStorage.setItem('token',`Bearer ${token}`)
+    //     //   localStorage.setItem('id',id)
+    //     // } else {
+    //       localStorage.setItem('token',`Bearer ${token}`)
+    //       localStorage.setItem('id',id)
+    //       localStorage.setItem('type', type)
+    //       localStorage.setItem('os_name', osNmae)
+    //     // }
+    //
+    //   })
+    // })()
   </script>
 </html>

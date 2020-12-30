@@ -357,21 +357,25 @@ const Calendar = () => {
     }
     try{
       const res = await axios.post(`http://15.165.17.192:8080/api/space/reserveNext/`, sendObject , config)
+      console.log(res.status)
+      if(res.status === 200) {
         if(localStorage.getItem('os_name') === 'AOS') {
+          const code = '0'
           const startDate = res.data.data.startDate
-          const endDate = res.data.data.endDate === '' ? 0 : res.data.data.endDate
-          const firstSelectTime = ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join()
-          const secondSelectTime = ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).join()
-          const thirdSelectTime = ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).length === 0 ? 0 : ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join()
+          const endDate = res.data.data.endDate === '' ? '0' : res.data.data.endDate
+          const firstSelectTime = ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).length === 0 ? '0' : ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join()
+          const secondSelectTime = ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).length === 0 ? '0' : ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).join()
+          const thirdSelectTime = ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).length === 0 ? '0' : ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join()
           const spaceName = res.data.data.spaceName
-          const totalPrice = res.data.data.totalPrice
+          const totalPrice = String(res.data.data.totalPrice)
           let spacepayment;
-          // console.log("::::::",startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice )
-          spacepayment.spacepaymentValue(startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
+          // console.log("::::::",typeof code, typeof startDate,typeof  endDate, typeof firstSelectTime, typeof secondSelectTime,typeof thirdSelectTime, typeof spaceName, typeof totalPrice )
+          spacepayment.spacepaymentValue(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
           localStorage.clear()
         } else if(localStorage.getItem('os_name') === 'IOS') {
           makeSendData(res.data.data)
         }
+      }
     } catch (e) {
       // window.ReactNativeWebView.postMessage(JSON.stringify(e.response.statusText))
       console.log(e.response)

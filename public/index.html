@@ -26,10 +26,16 @@
     -->
     <title>React App</title>
     <script>
-      localStorage.setItem("token","Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJNRU1CMDAwMDAwMDEiLCJpYXQiOjE2MDkyOTgyODgsImV4cCI6MTYwOTMyODI4OH0.N9v4RGmg5QMG-m-T52N397M1sN--tMTR-LVlerlAnxc");
+      localStorage.setItem("token","Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJNRU1CMDAwMDAwMDEiLCJpYXQiOjE2MDkzNzY1MTMsImV4cCI6MTYwOTQwNjUxM30.oD2_6XqaQLz2Jt8RgeUZi_osDBwRehZWo2bpjrr91PI");
       localStorage.setItem("id","SPAC00000002");
       localStorage.setItem("type","SPCL0003");
-      localStorage.setItem("os_name","AOS");
+      localStorage.setItem("os_name","IOS");
+    </script>
+    <script>
+      function sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice) {
+        // console.log(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice)
+        spacepayment.spacepaymentValue(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice )
+      }
     </script>
   </head>
   <body>

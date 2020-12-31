@@ -4,16 +4,30 @@ import './timeTable.scss'
 const ARR = ["9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00"];
 
 
-const TimeTable = ({selectDate, setSelectDate, ARR}) => {
+const TimeTable = ({selectDate, setSelectDate, ARR, ABLE_LIST}) => {
   const AM = ARR.slice(0, 4)
   const PM = ARR.slice(4, 12)
 
-  const TEST_ARR = [0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,];
-  const TEST_AM = TEST_ARR.slice(0, 4)
-  const TEST_PM = TEST_ARR.slice(4, 12)
-
-
   const [selectTime, setSelectTime] = useState([]);
+  const [listData, setListData] = useState({
+    am: [],
+    pm: []
+  })
+
+  useEffect(() => {
+    if(ABLE_LIST) {
+      const TEST_AM = ABLE_LIST.slice(0, 4)
+      const TEST_PM = ABLE_LIST.slice(4, 12)
+      setListData({
+        am: TEST_AM,
+        pm: TEST_PM
+      })
+    }
+  },[ABLE_LIST])
+
+  useEffect(() => {
+    setSelectTime([])
+  },[listData])
 
   const selectReserveTime = useCallback((time) => {
       if (selectTime.length >= 3) {
@@ -41,10 +55,9 @@ const TimeTable = ({selectDate, setSelectDate, ARR}) => {
       }
     }, [selectTime, selectDate])
 
-  console.log(selectTime)
 
   const disableButton = (arr, index) => {
-    if(arr[index] === 0) {
+    if(arr[index] === '0') {
       return true
     } else {
       return false
@@ -54,7 +67,7 @@ const TimeTable = ({selectDate, setSelectDate, ARR}) => {
   const getAmButton = useCallback(() => {
     return AM.map((el, index) => {
       // const disabled = TEST_AM.includes(el)
-      const disabled = disableButton(TEST_AM, index)
+      const disabled = disableButton(listData.am, index)
       // alert(disableButton(TEST_AM, index))
       const disabledStyle = disabled ? 'disabledStyle' : ''
       const active = selectTime.includes(index) ? 'active' : ''
@@ -64,11 +77,11 @@ const TimeTable = ({selectDate, setSelectDate, ARR}) => {
         </button>
       )
     })
-  },[selectTime, selectDate])
+  },[selectTime, selectDate, listData, ABLE_LIST])
 
   const getPmButton = useCallback(() => {
     return PM.map((el, index) => {
-      const disabled = disableButton(TEST_PM, index)
+      const disabled = disableButton(listData.pm, index)
       const disabledStyle = disabled ? 'disabledStyle' : ''
       const active = selectTime.includes(index + 4) ? 'active' : ''
       return (
@@ -77,7 +90,7 @@ const TimeTable = ({selectDate, setSelectDate, ARR}) => {
         </button>
       )
     })
-  },[selectTime, selectDate])
+  },[selectTime, selectDate, listData, ABLE_LIST])
 
 
   return (

@@ -12,11 +12,14 @@ const TODAY = moment().format('YYYY-MM-DD')
 const CUREENT_MONTH = moment().format('YYYY-MM')
 
 const ARR = ["9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00"];
+const ABLE_LIST = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',]
 
 const Calendar = () => {
   const mainCalendar = useRef(null)
 
   const [buttonDisable, setButtonDisable] = useState(true)
+
+  const [timeSelectAbleList, setTimeSelectAbleList] = useState(ABLE_LIST)
 
   const [ableDateList, setAbleDateList] = useState({
     prev: [],
@@ -272,6 +275,7 @@ const Calendar = () => {
     const TYPE = localStorage.getItem('type')
     const { startDate, endDate } = selectDate
     if(TYPE === 'SPCL0003') {
+        getTimeList(date.split('-').join(''))
         setSelectDate({
           ...selectDate,
           startDate: date
@@ -368,9 +372,9 @@ const Calendar = () => {
           const thirdSelectTime = ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).length === 0 ? '0' : ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join()
           const spaceName = res.data.data.spaceName
           const totalPrice = String(res.data.data.totalPrice)
-          let spacepayment;
+          window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice)
           // console.log("::::::",typeof code, typeof startDate,typeof  endDate, typeof firstSelectTime, typeof secondSelectTime,typeof thirdSelectTime, typeof spaceName, typeof totalPrice )
-          spacepayment.spacepaymentValue(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
+          // spacepayment.spacepaymentValue(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
           localStorage.clear()
         } else if(localStorage.getItem('os_name') === 'IOS') {
           makeSendData(res.data.data)
@@ -391,11 +395,23 @@ const Calendar = () => {
       }
       data.time = aar
     }
-
-
     window.ReactNativeWebView.postMessage(JSON.stringify(data))
     localStorage.clear()
   }
+
+  const getTimeList = useCallback(async (date) => {
+    try {
+      const res = await axios.get(`http://15.165.17.192:8080/api/space/reserveTime/${localStorage.getItem('id')}/${date}`,{
+        headers: {
+          Authorization: localStorage.getItem('token'),
+          withCredentials: true
+        }
+      })
+      setTimeSelectAbleList(res.data.data.timeList)
+    } catch (e) {
+      console.log(e)
+    }
+  },[selectDate])
 
   const getInitDate = useCallback(async () => {
     try {
@@ -532,7 +548,7 @@ const Calendar = () => {
         </div>
       </div>
       {localStorage.getItem('type') === 'SPCL0003' ? (
-        <TimeTable ARR={ARR} selectDate={selectDate} setSelectDate={setSelectDate}/>
+        <TimeTable ARR={ARR} ABLE_LIST={timeSelectAbleList} selectDate={selectDate} setSelectDate={setSelectDate}/>
       ) : null}
 
 

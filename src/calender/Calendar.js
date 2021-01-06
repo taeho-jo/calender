@@ -361,13 +361,13 @@ const Calendar = () => {
     }
     try{
       const res = await axios.post(`http://15.165.17.192:8080/api/space/reserveNext/`, sendObject , config)
-      console.log(res.status)
+      // console.log(res)
       if(res.status === 200) {
         if(localStorage.getItem('os_name') === 'AOS') {
           const code = '0'
           const startDate = res.data.data.startDate
           const endDate = res.data.data.endDate === '' ? '0' : res.data.data.endDate
-          const firstTime = res.data.data.time[0] ? ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join() : '0'
+          const firstTime = res.data.data.time.length > 0 ? ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join() : '0'
           const secondTime = res.data.data.time[1] ? ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).join() : '0'
           const thirdTime = res.data.data.time[2] ? ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join() : '0'
           const spaceName = res.data.data.spaceName
@@ -377,6 +377,7 @@ const Calendar = () => {
           const secondSelectTime = secondTime !== '0' ? (secondTime.split(':')[0] >= 9 && secondTime.split(':')[0] < 12 ? `오전 ${secondTime}` : `오후 ${secondTime}`) : '0'
           const thirdSelectTime = thirdTime !== '0' ? (thirdTime.split(':')[0] >= 9 && thirdTime.split(':')[0] < 12 ? `오전 ${thirdTime}` : `오후 ${thirdTime}`) : '0'
 
+          // console.log(res.data.data.time[0], 'ㅁㅁㅁㅁ')
           // console.log(firstSelectTime, secondSelectTime, thirdSelectTime)
           window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice)
           // console.log("::::::",typeof code, typeof startDate,typeof  endDate, typeof firstSelectTime, typeof secondSelectTime,typeof thirdSelectTime, typeof spaceName, typeof totalPrice )

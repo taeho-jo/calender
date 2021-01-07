@@ -4,7 +4,7 @@ import './timeTable.scss'
 const ARR = ["9:00", "10:00", "11:00", "12:00", "1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00"];
 
 
-const TimeTable = ({selectDate, setSelectDate, ARR, ABLE_LIST}) => {
+const TimeTable = ({getChoiceTimeList, selectDate, setSelectDate, ARR, ABLE_LIST}) => {
   const AM = ARR.slice(0, 4)
   const PM = ARR.slice(4, 12)
 
@@ -13,7 +13,7 @@ const TimeTable = ({selectDate, setSelectDate, ARR, ABLE_LIST}) => {
     am: [],
     pm: []
   })
-
+  console.log(selectTime, 'asdfasdfas')
   useEffect(() => {
     if(ABLE_LIST) {
       const TEST_AM = ABLE_LIST.slice(0, 4)
@@ -28,6 +28,10 @@ const TimeTable = ({selectDate, setSelectDate, ARR, ABLE_LIST}) => {
   useEffect(() => {
     setSelectTime([])
   },[listData])
+
+  useEffect(() => {
+    getChoiceTimeList(selectTime)
+  },[selectTime])
 
   const selectReserveTime = useCallback((time) => {
       if (selectTime.length >= 3) {
@@ -47,6 +51,7 @@ const TimeTable = ({selectDate, setSelectDate, ARR, ABLE_LIST}) => {
           time: removeArr
         })
       } else {
+
         setSelectTime([...selectTime, time]);
         setSelectDate({
           ...selectDate,

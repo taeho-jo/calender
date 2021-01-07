@@ -20,6 +20,7 @@ const Calendar = () => {
   const [buttonDisable, setButtonDisable] = useState(true)
 
   const [timeSelectAbleList, setTimeSelectAbleList] = useState(ABLE_LIST)
+  const [timeChoice, setTimeChoice] = useState('000000000000')
 
   const [ableDateList, setAbleDateList] = useState({
     prev: [],
@@ -372,26 +373,25 @@ const Calendar = () => {
           const thirdTime = res.data.data.time[2] ? ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join() : '0'
           const spaceName = res.data.data.spaceName
           const totalPrice = String(res.data.data.totalPrice)
+          const spaceReserveTime = timeChoice
 
           const firstSelectTime = firstTime !== '0' ? (firstTime.split(':')[0] >= 9 && firstTime.split(':')[0] < 12 ? `오전 ${firstTime}` : `오후 ${firstTime}`) : '0'
           const secondSelectTime = secondTime !== '0' ? (secondTime.split(':')[0] >= 9 && secondTime.split(':')[0] < 12 ? `오전 ${secondTime}` : `오후 ${secondTime}`) : '0'
           const thirdSelectTime = thirdTime !== '0' ? (thirdTime.split(':')[0] >= 9 && thirdTime.split(':')[0] < 12 ? `오전 ${thirdTime}` : `오후 ${thirdTime}`) : '0'
 
-          // console.log(res.data.data.time[0], 'ㅁㅁㅁㅁ')
-          // console.log(firstSelectTime, secondSelectTime, thirdSelectTime)
-          window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice)
-          // console.log("::::::",typeof code, typeof startDate,typeof  endDate, typeof firstSelectTime, typeof secondSelectTime,typeof thirdSelectTime, typeof spaceName, typeof totalPrice )
-          // spacepayment.spacepaymentValue(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice );
+          // console.log(firstSelectTime, secondSelectTime, thirdSelectTime, spaceReserveTime)
+          window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice, spaceReserveTime)
           localStorage.clear()
         } else if(localStorage.getItem('os_name') === 'IOS') {
-          makeSendData(res.data.data)
+          const sendObject = {...res.data.data, timeChoice: timeChoice}
+          makeSendData(sendObject)
         }
       }
     } catch (e) {
       // window.ReactNativeWebView.postMessage(JSON.stringify(e.response.statusText))
       console.log(e.response)
     }
-  },[selectDate, middleDate])
+  },[selectDate, middleDate, timeChoice])
 
   const makeSendData = (data) => {
     const timeList = data.time
@@ -478,6 +478,16 @@ const Calendar = () => {
 
   },[selectDate, localStorage])
 
+  const getChoiceTimeList = useCallback((arr) => {
+    console.log(arr, 'arrr')
+    let origin = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+    for(let i = 0; i < arr.length; i++) {
+      origin.splice(arr[i],1,"1")
+    }
+    console.log(origin.join(''), '제발')
+    setTimeChoice(origin.join(''))
+  },[])
+
 
   // ======================================== api 통신 test ========================================
 
@@ -555,7 +565,7 @@ const Calendar = () => {
         </div>
       </div>
       {localStorage.getItem('type') === 'SPCL0003' ? (
-        <TimeTable ARR={ARR} ABLE_LIST={timeSelectAbleList} selectDate={selectDate} setSelectDate={setSelectDate}/>
+        <TimeTable ARR={ARR} getChoiceTimeList={getChoiceTimeList} ABLE_LIST={timeSelectAbleList} selectDate={selectDate} setSelectDate={setSelectDate}/>
       ) : null}
 
 

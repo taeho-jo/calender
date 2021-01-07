@@ -62,7 +62,7 @@ const TimeTable = ({getChoiceTimeList, selectDate, setSelectDate, ARR, ABLE_LIST
 
 
   const disableButton = (arr, index) => {
-    if(arr[index] === '0') {
+    if(arr[index] === '1') {
       return true
     } else {
       return false

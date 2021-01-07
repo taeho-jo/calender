@@ -105,7 +105,7 @@ const Calendar = () => {
 
   // 예약 가능 날짜 판단
   const selectAbleDate = useCallback((i) => {
-    if (ableDateList.selected[i] === '0') {
+    if (ableDateList.selected[i] === '1') {
       return false
     } else {
       return true
@@ -116,7 +116,7 @@ const Calendar = () => {
     const month = arr.slice(0, length)
     const month2 = month.slice(month.length - a, month.length)
 
-    if(month2[i-1] === '0') {
+    if(month2[i-1] === '1') {
 
       return false
     } else {
@@ -128,7 +128,7 @@ const Calendar = () => {
     const month = arr.slice(0, length)
     const month2 = month.slice(0, a)
 
-    if(month2[i-1] === '0') {
+    if(month2[i-1] === '1') {
 
       return false
     } else {
@@ -367,7 +367,10 @@ const Calendar = () => {
         if(localStorage.getItem('os_name') === 'AOS') {
           const code = '0'
           const startDate = res.data.data.startDate
-          const endDate = res.data.data.endDate === '' ? '0' : res.data.data.endDate
+          const endDate1 = res.data.data.endDate === '' ? '0' : res.data.data.endDate
+          const endDate2 = res.data.data.endDate === '' ? res.data.data.startDate : res.data.data.endDate
+          const endDate = localStorage.getItem('type') === 'SPCL0002' ? endDate2 : endDate1
+
           const firstTime = res.data.data.time.length > 0 ? ARR.slice(res.data.data.time[0], res.data.data.time[0] + 1).join() : '0'
           const secondTime = res.data.data.time[1] ? ARR.slice(res.data.data.time[1], res.data.data.time[1] + 1).join() : '0'
           const thirdTime = res.data.data.time[2] ? ARR.slice(res.data.data.time[2], res.data.data.time[2] + 1).join() : '0'
@@ -379,7 +382,7 @@ const Calendar = () => {
           const secondSelectTime = secondTime !== '0' ? (secondTime.split(':')[0] >= 9 && secondTime.split(':')[0] < 12 ? `오전 ${secondTime}` : `오후 ${secondTime}`) : '0'
           const thirdSelectTime = thirdTime !== '0' ? (thirdTime.split(':')[0] >= 9 && thirdTime.split(':')[0] < 12 ? `오전 ${thirdTime}` : `오후 ${thirdTime}`) : '0'
 
-          // console.log(firstSelectTime, secondSelectTime, thirdSelectTime, spaceReserveTime)
+          // console.log(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice, spaceReserveTime)
           window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice, spaceReserveTime)
           localStorage.clear()
         } else if(localStorage.getItem('os_name') === 'IOS') {

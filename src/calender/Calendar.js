@@ -294,6 +294,8 @@ const Calendar = () => {
             startDate: date,
             endDate: ''
           });
+        } else if(TYPE === 'SPCL0001' && startDate === date) {
+          alert('최소 1박이상의 날짜를 선택해주세요.')
         } else {
           if(getValue) {
             alert('선택이 불가능한 일자가 포함되어있습니다.')
@@ -355,6 +357,7 @@ const Calendar = () => {
         osName: localStorage.getItem('os_name')
       }
     }
+    // console.log(sendObject)
     const config = {
       headers: {
         Authorization: `${localStorage.getItem('token')}`

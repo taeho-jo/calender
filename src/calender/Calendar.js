@@ -239,6 +239,7 @@ const Calendar = () => {
       return;
     } else {
       const bb = dateArr.filter(el => el.date === date)
+
       if(bb.length === 0){
         return;
       } else if(bb[0].able === false) {
@@ -259,7 +260,7 @@ const Calendar = () => {
       }
       return aa
     }
-  },[middleDate,selectDate])
+  },[middleDate,selectDate, dateArr])
 
   const getDate = useCallback((date, isOrigin, isAble) => {
     if(isAble) {
@@ -270,7 +271,7 @@ const Calendar = () => {
     } else {
       console.log(date)
     }
-  },[selectDate, middleDate])
+  },[selectDate, middleDate, dateArr])
 
   const getSelectDate = useCallback((date, getValue) => {
     const TYPE = localStorage.getItem('type')
@@ -321,7 +322,7 @@ const Calendar = () => {
     }
 
 
-  },[selectDate, middleDate])
+  },[selectDate, middleDate, dateArr])
 
   // 모바일로 날짜 넘겨주는 부분
   const sendData = useCallback(async () => {
@@ -357,7 +358,6 @@ const Calendar = () => {
         osName: localStorage.getItem('os_name')
       }
     }
-    // console.log(sendObject)
     const config = {
       headers: {
         Authorization: `${localStorage.getItem('token')}`
@@ -365,7 +365,6 @@ const Calendar = () => {
     }
     try{
       const res = await axios.post(`http://15.165.17.192:8080/api/space/reserveNext/`, sendObject , config)
-      // console.log(res)
       if(res.status === 200) {
         if(localStorage.getItem('os_name') === 'AOS') {
           const code = '0'
@@ -385,7 +384,6 @@ const Calendar = () => {
           const secondSelectTime = secondTime !== '0' ? (secondTime.split(':')[0] >= 9 && secondTime.split(':')[0] < 12 ? `오전 ${secondTime}` : `오후 ${secondTime}`) : '0'
           const thirdSelectTime = thirdTime !== '0' ? (thirdTime.split(':')[0] >= 9 && thirdTime.split(':')[0] < 12 ? `오전 ${thirdTime}` : `오후 ${thirdTime}`) : '0'
 
-          // console.log(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice, spaceReserveTime)
           window.sendAndroid(code, startDate, endDate, firstSelectTime, secondSelectTime,thirdSelectTime, spaceName, totalPrice, spaceReserveTime)
           localStorage.clear()
         } else if(localStorage.getItem('os_name') === 'IOS') {
@@ -428,8 +426,6 @@ const Calendar = () => {
 
   const getInitDate = useCallback(async () => {
     try {
-
-      // alert(`getInitData ${localStorage.getItem('id')} // ${localStorage.getItem('token')}`)
       const res = await axios.get(`http://15.165.17.192:8080/api/space/reserveMonth/${localStorage.getItem('id')}/${threeMonth.currentMonth}`, {
         headers: {
           Authorization: localStorage.getItem('token'),
@@ -485,12 +481,10 @@ const Calendar = () => {
   },[selectDate, localStorage])
 
   const getChoiceTimeList = useCallback((arr) => {
-    console.log(arr, 'arrr')
     let origin = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
     for(let i = 0; i < arr.length; i++) {
       origin.splice(arr[i],1,"1")
     }
-    console.log(origin.join(''), '제발')
     setTimeChoice(origin.join(''))
   },[])
 

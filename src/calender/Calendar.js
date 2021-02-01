@@ -4,6 +4,7 @@ import moment from "moment";
 import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
 import axios from 'axios'
 import TimeTable from "./TimeTable";
+import SelectDateBox from "./SelectDateBox";
 
 
 // 오늘 날짜
@@ -565,8 +566,14 @@ const Calendar = () => {
         </div>
       </div>
       {localStorage.getItem('type') === 'SPCL0003' ? (
-        <TimeTable ARR={ARR} getChoiceTimeList={getChoiceTimeList} ABLE_LIST={timeSelectAbleList} selectDate={selectDate} setSelectDate={setSelectDate}/>
-      ) : null}
+        <>
+          <TimeTable ARR={ARR} getChoiceTimeList={getChoiceTimeList} ABLE_LIST={timeSelectAbleList} selectDate={selectDate} setSelectDate={setSelectDate}/>
+          {/*<SelectDateBox ARR= selectDate={selectDate}/>*/}
+        </>
+      ) : <SelectDateBox type={localStorage.getItem('type')} selectDate={selectDate}/>}
+
+
+
 
 
       <div className='confirmButtonBox'>

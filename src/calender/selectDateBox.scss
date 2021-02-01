@@ -1,0 +1,22 @@
+//margin-top: 10px;
+//padding: 10px 20px 0 20px;
+////background-color: powderblue;
+
+.mainContainer {
+  margin-top: 10px;
+  padding: 10px 20px 0 20px;
+  font-size: 14px;
+
+  .timeBox {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+
+    .box {
+      width: 50%;
+      .boxTitle {
+        font-weight: bold;
+      }
+    }
+  }
+}

@@ -3,22 +3,36 @@
   //background-color: powderblue;
   margin-top: 10px;
 
-  .mainContainerTitle {
-    font-size: 16px;
-    font-weight: bold;
-    font-style: normal;
-    line-height: 20px;
-    letter-spacing: -0.3;
-    color: black;
-  }
-  .mainContainerSubTitle {
-    margin-left: 10px;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    line-height: 16px;
-    letter-spacing: 0;
-    color: #8f92a1;
+  .timeTableTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .mainContainerTitle {
+      font-size: 16px;
+      font-weight: bold;
+      font-style: normal;
+      line-height: 20px;
+      letter-spacing: -0.3;
+      color: black;
+    }
+    .mainContainerSubTitle {
+      margin-left: 10px;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      line-height: 16px;
+      letter-spacing: 0;
+      color: #8f92a1;
+    }
+    .resetBtn {
+      border: 1px solid #8f92a1;
+      padding: 5px;
+      background: none;
+      border-radius: 7px;
+      font-weight: bold;
+      outline: none;
+    }
   }
 
   .timeContainer {
@@ -72,5 +86,24 @@
   .pmContainer {
     margin-top: 15px;
   }
+
+  .selectTimeBox {
+    margin-top: 15px;
+    font-size: 14px;
+
+    .boxTitle {
+      font-weight: bold;
+    }
+    .timeBox {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+
+      .box {
+        width: 50%
+      }
+    }
+  }
+
 }
 
